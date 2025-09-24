@@ -48,24 +48,47 @@ Permute digits of N and return a set
 */
 fn permute_n(n: u128) -> HashSet<u128> {
 
+    fn permute_char_digits(digits: Vec<char>) -> HashSet<Vec<char>> {
+        let mut permutations: HashSet<Vec<char>> = HashSet::new();
+
+        if digits.len() == 1 {
+            permutations.insert(digits);
+            return permutations;
+        }
+
+        for digit in digits.iter() {}
+
+
+        permutations
+    }
+
     fn permute_digits(digits: Vec<char>) -> HashSet<u128> {
         let mut permutations: HashSet<u128> = HashSet::new();
 
         if digits.len() == 1 {
-            permutations.insert(digits[0] as u128);
+            let Some(leading_digit) = digits[0].to_digit(10) else {panic!("Cannot convert {} to digit", digits[0])}; // pick the leading digit
+            // dbg!(&leading_digit);
+            permutations.insert(leading_digit as u128);
             return permutations;
         }
 
         let pow = (digits.len() - 1) as u32;
+        // dbg!(&pow);
         for i in 0..digits.len() {
-            let leading_digit = digits[i]; // pick the leading digit
+            let Some(leading_digit) = digits[i].to_digit(10) else {panic!("Cannot convert {} to digit", digits[i])}; // pick the leading digit
+            // dbg!(&leading_digit);
             let multiplier = (leading_digit as u128) * 10u128.pow(pow);
+            // dbg!(&multiplier);
             let mut remaining_digits = digits.clone();
             remaining_digits.remove(i);
+            // dbg!(&remaining_digits);
             let remaining_permutations = permute_digits(remaining_digits);
 
             for permutation in remaining_permutations.iter() {
                 let new_permutation = permutation + multiplier;
+                // dbg!(&permutation);
+                // dbg!(&multiplier);
+                // dbg!(&new_permutation);
                 permutations.insert(new_permutation);
             }
         }
@@ -74,6 +97,7 @@ fn permute_n(n: u128) -> HashSet<u128> {
     }
 
     let digits: Vec<char> = n.to_string().chars().collect();
+    dbg!(&digits);
     let permutations = permute_digits(digits);
     permutations
 }

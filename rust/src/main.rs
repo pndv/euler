@@ -38,9 +38,15 @@ fn find_heptaphobic(n: u128) -> u128 {
         }
     }
 
-    dbg!(&heptaphilic_numbers.len());
-    dbg!(&heptaphilic_numbers);
-    n - (heptaphilic_numbers.len() as u128)
+    // For debugging
+    let mut elems: Vec<u128> = heptaphilic_numbers.iter().copied().collect();
+    elems.sort_unstable();
+    println!("heptaphilic_numbers ({} elems): {:?}", elems.len(), elems);
+
+
+
+    // since we are finding all numbers less than n, subtract 1 from n
+    (n - 1) - (heptaphilic_numbers.len() as u128)
 }
 
 /**
@@ -48,122 +54,53 @@ Permute digits of N and return a set
 */
 fn permute_n(n: u128) -> HashSet<u128> {
 
-    fn permute_char_digits(digits: Vec<char>) -> HashSet<Vec<char>> {
-        let mut permutations: HashSet<Vec<char>> = HashSet::new();
+    fn permute_char_digits(digits: Vec<char>) -> HashSet<String> {
+        let mut permutations: HashSet<String> = HashSet::new();
 
         if digits.len() == 1 {
-            permutations.insert(digits);
+            permutations.insert(digits[0].to_string());
             return permutations;
         }
 
-        for digit in digits.iter() {}
-
-
-        permutations
-    }
-
-    fn permute_digits(digits: Vec<char>) -> HashSet<u128> {
-        let mut permutations: HashSet<u128> = HashSet::new();
-
-        if digits.len() == 1 {
-            let Some(leading_digit) = digits[0].to_digit(10) else {panic!("Cannot convert {} to digit", digits[0])}; // pick the leading digit
-            // dbg!(&leading_digit);
-            permutations.insert(leading_digit as u128);
-            return permutations;
-        }
-
-        let pow = (digits.len() - 1) as u32;
-        // dbg!(&pow);
         for i in 0..digits.len() {
-            let Some(leading_digit) = digits[i].to_digit(10) else {panic!("Cannot convert {} to digit", digits[i])}; // pick the leading digit
-            // dbg!(&leading_digit);
-            let multiplier = (leading_digit as u128) * 10u128.pow(pow);
-            // dbg!(&multiplier);
             let mut remaining_digits = digits.clone();
             remaining_digits.remove(i);
-            // dbg!(&remaining_digits);
-            let remaining_permutations = permute_digits(remaining_digits);
+            let prepend_digit = digits[i];
+            let remaining_permutations = permute_char_digits(remaining_digits);
 
             for permutation in remaining_permutations.iter() {
-                let new_permutation = permutation + multiplier;
-                // dbg!(&permutation);
-                // dbg!(&multiplier);
-                // dbg!(&new_permutation);
+                let new_permutation = prepend_digit.to_string() + permutation;
                 permutations.insert(new_permutation);
             }
         }
 
+
         permutations
     }
 
+
     let digits: Vec<char> = n.to_string().chars().collect();
-    dbg!(&digits);
-    let permutations = permute_digits(digits);
-    permutations
-}
+    let mut output: HashSet<u128> = HashSet::new();
+    let string_permutations = permute_char_digits(digits.clone());
+    // dbg!(&string_permutations);
+    for permutation in string_permutations.iter() {
+        // ignore leading zeros for any string starting with 0, and length more than 1
+        // i.e., unless the number is 0 itself, ignore any other number which starts with 0
+        if permutation.starts_with("0") && permutation.len() > 1 {
+            continue;
+        }
 
-/// Generates digits of a number
-///
-/// # Arguments
-///
-/// * `n`:
-///
-/// returns: Vec<u128, Global>
-///
-/// # Examples
-///
-/// ```
-///
-/// ```
-fn get_digits(mut number: u128) -> Vec<u8> {
-    let mut digits: Vec<u8> = Vec::new();
-    if number == 0 {
-        digits.push(0);
-        return digits;
+        let number = permutation.parse::<u128>().unwrap();
+        output.insert(number);
     }
 
-    while number > 0 {
-        let digit = (number % 10) as u8;
-        number = number / 10;
-        digits.push(digit);
-    }
-
-    digits.reverse();
-
-    digits
+    output
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
 
-    #[test]
-    fn test_get_digits_unique() {
-        let output = get_digits(12345678);
-        let expected = vec![1,2,3,4,5,6,7,8];
-        assert_eq!(output, expected);
-    }
-
-    #[test]
-    fn test_get_digits_with_zeros() {
-        let output = get_digits(1230);
-        let expected = vec![1,2,3,0];
-        assert_eq!(output, expected);
-    }
-
-    #[test]
-    fn test_get_digits_with_leading_zeros() {
-        let output = get_digits(01230);
-        let expected = vec![1,2,3,0];
-        assert_eq!(output, expected);
-    }
-
-    #[test]
-    fn test_get_digits_with_leading_duplicates() {
-        let output = get_digits(112330);
-        let expected = vec![1,1,2,3,3,0];
-        assert_eq!(output, expected);
-    }
 
     #[test]
     fn test_permute() {

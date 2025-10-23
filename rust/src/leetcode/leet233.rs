@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-use std::ops::RangeInclusive;
-
+#[allow(dead_code)]
 /// Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.
 ///
 /// Example 1:
@@ -26,13 +25,11 @@ pub fn count_digit_one(n: i32) -> i32 {
         memoization_table: &mut HashMap<(IsConstrained, Index, OnesToLeft), Count>,
         count: OnesToLeft,
     ) -> Count {
-
         if index >= digits.len() {
             return count;
         }
 
         if let Some(&val) = memoization_table.get(&(is_constrained, index, count)) {
-            println!("{:?} found in table", (is_constrained, index, count));
             return val;
         }
 
@@ -40,12 +37,7 @@ pub fn count_digit_one(n: i32) -> i32 {
         let iterate_up_to = if is_constrained { digits[index] } else { 9u8 };
 
         for i in 0..=iterate_up_to {
-            println!("index {}, is_constrained {}, iterating upto {},  count {}, i {}", index, is_constrained, iterate_up_to, count, i);
-            let updated_count = if i == 1 {
-                count + 1
-            } else {
-                count
-            };
+            let updated_count = if i == 1 { count + 1 } else { count };
             let should_constrain_next = i == iterate_up_to && is_constrained;
             total_ones += helper(
                 digits,
@@ -56,8 +48,7 @@ pub fn count_digit_one(n: i32) -> i32 {
             );
         }
         if !is_constrained {
-
-        memoization_table.insert((is_constrained, index, count), total_ones);
+            memoization_table.insert((is_constrained, index, count), total_ones);
         }
 
         total_ones
@@ -74,7 +65,6 @@ pub fn count_digit_one(n: i32) -> i32 {
         .collect::<Vec<u8>>();
     let mut memo_table: HashMap<(IsConstrained, Index, OnesToLeft), Count> = HashMap::new();
 
-    // let output = count_helper(digits, true, &mut memo_table);
     let output = helper(&digits, 0, true, &mut memo_table, 0);
     println!("{:?}", memo_table);
     output as i32

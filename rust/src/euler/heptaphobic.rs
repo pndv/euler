@@ -1,6 +1,8 @@
 use std::collections::HashSet;
-
+#[allow(dead_code)]
 /***
+https://projecteuler.net/problem=954
+
 A positive integer is called heptaphobic if it is not divisible by seven and no number divisible by
 seven can be produced by swapping two of its digits.
 Note that leading zeros are not allowed before or after the swap.
@@ -12,6 +14,30 @@ Let C(N) count heptaphobic numbers smaller than N. You are given C(100) = 74 and
 
 Find C(10^13).
 **/
+
+
+pub fn count(n: u128) -> u128 {
+
+    fn helper(digits: &Vec<u8>, index: usize, is_constrained: bool, is_preceding_zero: bool ) -> u128 {
+        let iterate_limit = if is_constrained { digits[index] } else { 9 };
+
+        for i in 0..=iterate_limit {
+            let next_is_preceding_zero = i==0 && is_preceding_zero;
+            let next_is_constrained = i==digits[index] && is_constrained;
+
+
+
+        }
+
+
+        0
+    }
+
+    let digits: Vec<u8> = (n - 1).to_string().chars().map(|x| x.to_digit(10).unwrap() as u8).collect();
+    let answer = helper(&digits, 0, true, digits[0] == 0);
+    answer
+}
+
 
 pub fn find_heptaphobic(n: u128) -> u128 {
     let mut non_heptaphobic_count: u128 = 0;
@@ -42,40 +68,6 @@ pub fn find_heptaphobic(n: u128) -> u128 {
     // since we are finding all numbers less than n, subtract 1 from n
     (n - 1) - (non_heptaphobic_count)
 }
-
-
-fn count_heptaphobic(n: u128) -> u128 {
-    let mut heptaphilic: HashSet<u128> = HashSet::new();
-    for i in 1..n {
-        if i % 7 == 0 {
-            heptaphilic.insert(i);
-
-        }
-
-        let permutations = permute_n(i);
-        let iterator = permutations.iter();
-        // If any permutation is heptaphobic, add all permutations to the set
-        for permutation in iterator {
-            if permutation % 7 == 0 {
-                // dbg!(permutation);
-                // dbg!(&permutations);
-                heptaphilic.insert(i);
-                break;
-            }
-        }
-    }
-
-    // For debugging
-    let mut elems: Vec<u128> = heptaphilic.iter().copied().collect();
-    elems.sort_unstable();
-    println!("heptaphilic_numbers ({} elems): {:?}", elems.len(), elems);
-
-
-
-    // since we are finding all numbers less than n, subtract 1 from n
-    (n - 1) - (heptaphilic.len() as u128)
-}
-
 
 
 /**

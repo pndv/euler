@@ -1,10 +1,15 @@
 use std::collections::HashMap;
+use crate::leetcode::{Index, IsConstrained};
+use crate::leetcode::Count;
+
 #[allow(dead_code)]
 /// Given an integer n, count the total number of digit 1 appearing in all non-negative integers less than or equal to n.
 ///
 /// Example 1:
 /// Input: n = 13
 /// Output: 6
+/// 1 2 3 4 5 6 7 8 9 10 11 12 13
+/// ^                 ^  ^^ ^  ^ = 6
 ///
 /// Example 2:
 /// Input: n = 0
@@ -13,9 +18,6 @@ use std::collections::HashMap;
 /// Constraints:
 /// 0 <= n <= 10^9
 pub fn count_digit_one(n: i32) -> i32 {
-    type Index = usize;
-    type Count = u32;
-    type IsConstrained = bool;
     type OnesToLeft = u32; // the number of ones to the left of the current index
 
     fn helper(
